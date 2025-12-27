@@ -4,6 +4,7 @@ const stopBtn = document.getElementById('stopBtn');
 const volumeCircle = document.getElementById('volumeCircle');
 const thresholdCircle = document.getElementById('thresholdCircle');
 const volumeValue = document.getElementById('volumeValue');
+const volumeLabel = document.querySelector('.volume-label');
 const statusText = document.getElementById('statusText');
 const meterBar = document.getElementById('meterBar');
 const thresholdSlider = document.getElementById('thresholdSlider');
@@ -66,8 +67,9 @@ startBtn.addEventListener('click', async () => {
         initAudio(stream);
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        statusText.textContent = '마이크 활성화됨';
-        statusText.classList.remove('safe', 'warning');
+        statusText.style.display = 'none';
+        volumeLabel.classList.remove('stopped');
+        volumeLabel.classList.add('active');
     } catch (err) {
         console.error('마이크 접근 오류:', err);
         alert('마이크 접근 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
@@ -79,8 +81,9 @@ stopBtn.addEventListener('click', () => {
     stopAudio();
     startBtn.disabled = false;
     stopBtn.disabled = true;
-    statusText.textContent = '마이크 정지됨';
-    statusText.classList.remove('safe', 'warning');
+    statusText.style.display = 'none';
+    volumeLabel.classList.remove('active');
+    volumeLabel.classList.add('stopped');
     volumeValue.textContent = '0';
     meterBar.style.width = '0%';
     volumeCircle.classList.remove('safe', 'warning');
@@ -168,20 +171,6 @@ function updateUI(volume) {
     meterBar.classList.remove('warning');
     if (isOverThreshold) {
         meterBar.classList.add('warning');
-    }
-
-    // Update status text
-    statusText.classList.remove('safe', 'warning');
-    if (volume > 0) {
-        if (isOverThreshold) {
-            statusText.textContent = '⚠️ 너무 시끄러워요!';
-            statusText.classList.add('warning');
-        } else {
-            statusText.textContent = '✓ 좋아요! 계속하세요';
-            statusText.classList.add('safe');
-        }
-    } else {
-        statusText.textContent = '마이크 활성화됨';
     }
 
     // Update volume history (throttled to once every 200ms)
