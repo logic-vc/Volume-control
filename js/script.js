@@ -41,11 +41,9 @@ window.addEventListener('resize', resizeChart);
 
 // Update threshold circle size
 function updateThresholdCircle() {
-    // 볼륨 원 초기 크기 60px, scale 1~10
-    // threshold 0 -> 60px (scale 1에 해당)
-    // threshold 100 -> 600px (scale 10에 해당)
-    const minSize = 60;
-    const maxSize = 600;
+    // threshold 0 -> 50px, threshold 50 -> 150px, threshold 100 -> 250px
+    const minSize = 50;
+    const maxSize = 250;
     const size = minSize + (threshold / 100) * (maxSize - minSize);
     thresholdCircle.style.width = size + 'px';
     thresholdCircle.style.height = size + 'px';
@@ -149,9 +147,10 @@ function updateUI(volume) {
     // Check against threshold
     const isOverThreshold = volume > threshold;
 
-    // Update circle size based on volume (1 to 10 scale for better visibility)
+    // Update circle size based on volume (1 to 5 scale)
+    // volume 0 -> 50px (scale 1), volume 50 -> 150px (scale 3), volume 100 -> 250px (scale 5)
     const minScale = 1;
-    const maxScale = 10;
+    const maxScale = 5;
     const scale = minScale + (volume / 100) * (maxScale - minScale);
     volumeCircle.style.transform = `scale(${scale})`;
 
