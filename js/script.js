@@ -2,6 +2,7 @@
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
 const volumeCircle = document.getElementById('volumeCircle');
+const thresholdCircle = document.getElementById('thresholdCircle');
 const volumeValue = document.getElementById('volumeValue');
 const statusText = document.getElementById('statusText');
 const meterBar = document.getElementById('meterBar');
@@ -17,7 +18,9 @@ let javascriptNode;
 let animationId;
 let threshold = 50;
 let volumeHistory = [];
-const maxHistoryLength = 50;
+const maxHistoryLength = 150; // 30초 (0.2초마다 1개 = 150개)
+let lastHistoryUpdate = 0;
+const historyUpdateInterval = 200; // 0.2초마다 히스토리 업데이트
 
 // Chart Setup
 const ctx = volumeChart.getContext('2d');
@@ -28,7 +31,7 @@ let chartHeight = volumeChart.height;
 function resizeChart() {
     const container = volumeChart.parentElement;
     chartWidth = container.clientWidth - 60;
-    chartHeight = 200;
+    chartHeight = 150;
     volumeChart.width = chartWidth;
     volumeChart.height = chartHeight;
 }
@@ -36,11 +39,23 @@ function resizeChart() {
 resizeChart();
 window.addEventListener('resize', resizeChart);
 
+// Update threshold circle size
+function updateThresholdCircle() {
+    const maxSize = 280; // Maximum diameter
+    const size = (threshold / 100) * maxSize;
+    thresholdCircle.style.width = size + 'px';
+    thresholdCircle.style.height = size + 'px';
+}
+
 // Initialize Threshold from Slider
 thresholdSlider.addEventListener('input', (e) => {
     threshold = parseInt(e.target.value);
     thresholdDisplay.textContent = threshold;
+    updateThresholdCircle();
 });
+
+// Initialize threshold circle
+updateThresholdCircle();
 
 // Start Microphone
 startBtn.addEventListener('click', async () => {
@@ -67,6 +82,7 @@ stopBtn.addEventListener('click', () => {
     volumeValue.textContent = '0';
     meterBar.style.width = '0%';
     volumeCircle.classList.remove('safe', 'warning');
+    volumeCircle.style.transform = 'scale(1)';
     meterBar.classList.remove('warning');
 });
 
@@ -129,6 +145,12 @@ function updateUI(volume) {
     // Check against threshold
     const isOverThreshold = volume > threshold;
 
+    // Update circle size based on volume (1 to 5 scale)
+    const minScale = 1;
+    const maxScale = 5;
+    const scale = minScale + (volume / 100) * (maxScale - minScale);
+    volumeCircle.style.transform = `scale(${scale})`;
+
     // Update circle styling
     volumeCircle.classList.remove('safe', 'warning');
     if (volume > 0) {
@@ -159,14 +181,18 @@ function updateUI(volume) {
         statusText.textContent = '마이크 활성화됨';
     }
 
-    // Update volume history
-    volumeHistory.push(volume);
-    if (volumeHistory.length > maxHistoryLength) {
-        volumeHistory.shift();
-    }
+    // Update volume history (throttled to once every 200ms)
+    const now = Date.now();
+    if (now - lastHistoryUpdate >= historyUpdateInterval) {
+        volumeHistory.push(volume);
+        if (volumeHistory.length > maxHistoryLength) {
+            volumeHistory.shift();
+        }
+        lastHistoryUpdate = now;
 
-    // Draw chart
-    drawChart();
+        // Draw chart
+        drawChart();
+    }
 }
 
 // Draw Volume History Chart

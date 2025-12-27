@@ -32,9 +32,12 @@
 
             <!-- Volume Display Area -->
             <div class="volume-display-container">
-                <div class="volume-circle" id="volumeCircle">
-                    <div class="volume-value" id="volumeValue">0</div>
-                    <div class="volume-label">현재 볼륨</div>
+                <div class="volume-circles-wrapper">
+                    <div class="threshold-circle" id="thresholdCircle"></div>
+                    <div class="volume-circle" id="volumeCircle">
+                        <div class="volume-value" id="volumeValue">0</div>
+                        <div class="volume-label">현재 볼륨</div>
+                    </div>
                 </div>
                 <div class="status-text" id="statusText">마이크를 시작하세요</div>
             </div>
@@ -94,17 +97,22 @@
                     <p class="brand-tagline">스마트한 보컬 연습 솔루션</p>
                 </div>
                 <div class="social-links">
-                    <a href="https://youtube.com" target="_blank" class="social-link youtube" title="YouTube">
+                    <a href="https://www.youtube.com/@VOCAL-LOGIC" target="_blank" class="social-link youtube" title="YouTube">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                         </svg>
                     </a>
-                    <a href="https://blog.naver.com" target="_blank" class="social-link blog" title="Blog">
+                    <a href="https://blog.naver.com/jellman" target="_blank" class="social-link blog" title="Blog">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                         </svg>
                     </a>
-                    <a href="https://kakaocorp.com" target="_blank" class="social-link kakao" title="KakaoTalk">
+                    <a href="http://pf.kakao.com/_vxnbxgT/chat" target="_blank" class="social-link kakao-chat" title="카카오톡 1:1 상담">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 0 1-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3zm5.907 8.06l1.47-1.424a.472.472 0 0 0-.656-.678l-1.928 1.866V9.282a.472.472 0 0 0-.944 0v2.557a.471.471 0 0 0 0 .222V13.5a.472.472 0 0 0 .944 0v-1.363l.427-.413 1.428 2.033a.472.472 0 1 0 .773-.543l-1.514-2.155zm-2.958 1.924h-1.46V9.297a.472.472 0 0 0-.943 0v4.159c0 .26.21.472.471.472h1.932a.472.472 0 1 0 0-.944zm-5.857-1.092l.696-1.707.638 1.707H9.092zm2.523.488l.002-.016a.469.469 0 0 0-.127-.32l-1.046-2.8a.69.69 0 0 0-.627-.474.696.696 0 0 0-.653.447l-1.661 4.075a.472.472 0 0 0 .874.357l.33-.813h2.07l.293.801a.472.472 0 1 0 .884-.297l-.339-.96zM8.293 9.302a.472.472 0 0 0-.471-.472H4.577a.472.472 0 1 0 0 .944h1.16v3.736a.472.472 0 0 0 .944 0V9.774h1.14c.261 0 .472-.211.472-.472z"/>
+                        </svg>
+                    </a>
+                    <a href="https://open.kakao.com/o/g9nFmjXf" target="_blank" class="social-link kakao-group" title="카카오톡 단톡방">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 0 1-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3zm5.907 8.06l1.47-1.424a.472.472 0 0 0-.656-.678l-1.928 1.866V9.282a.472.472 0 0 0-.944 0v2.557a.471.471 0 0 0 0 .222V13.5a.472.472 0 0 0 .944 0v-1.363l.427-.413 1.428 2.033a.472.472 0 1 0 .773-.543l-1.514-2.155zm-2.958 1.924h-1.46V9.297a.472.472 0 0 0-.943 0v4.159c0 .26.21.472.471.472h1.932a.472.472 0 1 0 0-.944zm-5.857-1.092l.696-1.707.638 1.707H9.092zm2.523.488l.002-.016a.469.469 0 0 0-.127-.32l-1.046-2.8a.69.69 0 0 0-.627-.474.696.696 0 0 0-.653.447l-1.661 4.075a.472.472 0 0 0 .874.357l.33-.813h2.07l.293.801a.472.472 0 1 0 .884-.297l-.339-.96zM8.293 9.302a.472.472 0 0 0-.471-.472H4.577a.472.472 0 1 0 0 .944h1.16v3.736a.472.472 0 0 0 .944 0V9.774h1.14c.261 0 .472-.211.472-.472z"/>
                         </svg>
