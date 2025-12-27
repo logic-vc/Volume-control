@@ -41,7 +41,7 @@ window.addEventListener('resize', resizeChart);
 
 // Update threshold circle size
 function updateThresholdCircle() {
-    const maxSize = 600; // Maximum diameter (increased for better visibility)
+    const maxSize = 280; // Maximum diameter
     const size = (threshold / 100) * maxSize;
     thresholdCircle.style.width = size + 'px';
     thresholdCircle.style.height = size + 'px';
