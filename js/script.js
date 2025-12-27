@@ -41,8 +41,12 @@ window.addEventListener('resize', resizeChart);
 
 // Update threshold circle size
 function updateThresholdCircle() {
-    const maxSize = 280; // Maximum diameter
-    const size = (threshold / 100) * maxSize;
+    // 볼륨 원 초기 크기 60px, scale 1~10
+    // threshold 0 -> 60px (scale 1에 해당)
+    // threshold 100 -> 600px (scale 10에 해당)
+    const minSize = 60;
+    const maxSize = 600;
+    const size = minSize + (threshold / 100) * (maxSize - minSize);
     thresholdCircle.style.width = size + 'px';
     thresholdCircle.style.height = size + 'px';
 }
