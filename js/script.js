@@ -41,7 +41,7 @@ window.addEventListener('resize', resizeChart);
 
 // Update threshold circle size
 function updateThresholdCircle() {
-    const maxSize = 280; // Maximum diameter
+    const maxSize = 600; // Maximum diameter (increased for better visibility)
     const size = (threshold / 100) * maxSize;
     thresholdCircle.style.width = size + 'px';
     thresholdCircle.style.height = size + 'px';
@@ -145,9 +145,9 @@ function updateUI(volume) {
     // Check against threshold
     const isOverThreshold = volume > threshold;
 
-    // Update circle size based on volume (1 to 5 scale)
+    // Update circle size based on volume (1 to 10 scale for better visibility)
     const minScale = 1;
-    const maxScale = 5;
+    const maxScale = 10;
     const scale = minScale + (volume / 100) * (maxScale - minScale);
     volumeCircle.style.transform = `scale(${scale})`;
 

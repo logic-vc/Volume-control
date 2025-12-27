@@ -10,8 +10,7 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <h1 class="logo">🎤 Vocal Volume Monitor</h1>
-            <p class="subtitle">조용히 노래 연습하세요!</p>
+            <h1 class="logo">🎤 Vocal Volume Monitor <span class="subtitle">일정한 볼륨으로 노래 하세요</span></h1>
         </div>
     </header>
 
@@ -49,35 +48,21 @@
 
             <!-- Threshold Settings -->
             <div class="settings-panel">
-                <div class="setting-group">
-                    <label for="thresholdSlider" class="setting-label">
-                        <span>기준 볼륨</span>
-                        <span class="threshold-value" id="thresholdDisplay">50</span>
-                    </label>
-                    <input
-                        type="range"
-                        id="thresholdSlider"
-                        class="slider"
-                        min="0"
-                        max="100"
-                        value="50"
-                    >
-                    <div class="slider-labels">
-                        <span>조용함</span>
-                        <span>시끄러움</span>
-                    </div>
+                <div class="threshold-info">
+                    <span>기준 볼륨: <span class="threshold-value" id="thresholdDisplay">50</span></span>
+                    <span class="divider">|</span>
+                    <span class="safe-text">✓ 기준 이하 = 초록색</span>
+                    <span class="divider">|</span>
+                    <span class="warning-text">⚠ 기준 초과 = 빨간색</span>
                 </div>
-
-                <div class="info-box">
-                    <div class="info-item safe">
-                        <div class="info-icon">✓</div>
-                        <div class="info-text">기준 이하 = 안전 (초록색)</div>
-                    </div>
-                    <div class="info-item warning">
-                        <div class="info-icon">!</div>
-                        <div class="info-text">기준 초과 = 경고 (빨간색)</div>
-                    </div>
-                </div>
+                <input
+                    type="range"
+                    id="thresholdSlider"
+                    class="slider-circular"
+                    min="0"
+                    max="100"
+                    value="50"
+                >
             </div>
 
             <!-- Volume History Chart -->
@@ -93,8 +78,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <h2 class="brand-name">VOCAL LOGIC</h2>
-                    <p class="brand-tagline">스마트한 보컬 연습 솔루션</p>
+                    &copy; 2025 VOCAL LOGIC
                 </div>
                 <div class="social-links">
                     <a href="https://www.youtube.com/@VOCAL-LOGIC" target="_blank" class="social-link youtube" title="YouTube">
@@ -118,9 +102,6 @@
                         </svg>
                     </a>
                 </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 VOCAL LOGIC. All rights reserved.</p>
             </div>
         </div>
     </footer>
