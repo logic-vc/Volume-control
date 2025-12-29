@@ -170,27 +170,34 @@ function getRMSVolume(array) {
 
     const rms = Math.sqrt(sumSquares / array.length);
 
-    // Simple linear scaling optimized for vocal practice
-    // Typical vocal RMS ranges: 0.02-0.3
-    // Target output: 0-100
+    // Segmented scaling optimized for vocal practice feedback
+    // Three distinct ranges for better control:
     //
-    // Examples:
-    // - Whisper (0.02):  ~16
-    // - Soft (0.05):     ~25
-    // - Normal (0.1):    ~40
-    // - Loud (0.2):      ~70
-    // - Very loud (0.3): ~100
+    // 작은 소리 (Soft):   10-30  (RMS 0.01-0.08)
+    // 중간 소리 (Medium): 40-60  (RMS 0.08-0.15)
+    // 큰 소리 (Loud):     80-90  (RMS 0.15-0.3+)
+    //
     let volume;
+
     if (rms < 0.002) {
         // Noise floor - ignore very quiet signals
         volume = 0;
+    } else if (rms < 0.08) {
+        // 작은 소리: 0.01~0.08 RMS → 10~30
+        volume = 10 + ((rms - 0.01) / (0.08 - 0.01)) * 20;
+    } else if (rms < 0.15) {
+        // 중간 소리: 0.08~0.15 RMS → 40~60
+        volume = 40 + ((rms - 0.08) / (0.15 - 0.08)) * 20;
+    } else if (rms < 0.3) {
+        // 큰 소리: 0.15~0.3 RMS → 80~90
+        volume = 80 + ((rms - 0.15) / (0.3 - 0.15)) * 10;
     } else {
-        // Linear scaling: rms * 300 + 10
-        volume = Math.round(rms * 300 + 10);
+        // 매우 큰 소리: 0.3+ RMS → 90~100
+        volume = 90 + Math.min(10, (rms - 0.3) * 50);
     }
 
-    // Clamp to 0-100 range
-    return Math.min(100, Math.max(0, volume));
+    // Round and clamp to 0-100 range
+    return Math.min(100, Math.max(0, Math.round(volume)));
 }
 
 // Update UI with Volume Data
