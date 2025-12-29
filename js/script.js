@@ -82,7 +82,14 @@ updateThresholdCircle();
 // Start Microphone
 startBtn.addEventListener('click', async () => {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Disable browser auto-adjustments for accurate vocal measurement
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: false,  // No echo cancellation
+                noiseSuppression: false,  // No noise suppression
+                autoGainControl: false    // CRITICAL: Disable AGC to prevent volume auto-adjustment
+            }
+        });
         initAudio(stream);
         startBtn.disabled = true;
         stopBtn.disabled = false;
@@ -118,7 +125,7 @@ function initAudio(stream) {
     javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
 
     // Optimized settings for vocal volume measurement
-    analyser.smoothingTimeConstant = 0.7; // Balance between responsiveness and stability
+    analyser.smoothingTimeConstant = 0.3; // Lower smoothing for more responsive time domain measurement
     analyser.fftSize = 2048; // Sample size for time domain analysis
 
     microphone.connect(analyser);
@@ -163,24 +170,27 @@ function getRMSVolume(array) {
 
     const rms = Math.sqrt(sumSquares / array.length);
 
-    // Apply dynamic range compression for better vocal practice feedback
-    // This makes mid-range volumes more visible while still showing extremes
-    let compressed;
-    if (rms < 0.01) {
-        // Very quiet: minimal response
-        compressed = rms * 50;
-    } else if (rms < 0.1) {
-        // Quiet to medium: boosted response for practice
-        compressed = 0.5 + (rms - 0.01) * 30;
+    // Simple linear scaling optimized for vocal practice
+    // Typical vocal RMS ranges: 0.02-0.3
+    // Target output: 0-100
+    //
+    // Examples:
+    // - Whisper (0.02):  ~16
+    // - Soft (0.05):     ~25
+    // - Normal (0.1):    ~40
+    // - Loud (0.2):      ~70
+    // - Very loud (0.3): ~100
+    let volume;
+    if (rms < 0.002) {
+        // Noise floor - ignore very quiet signals
+        volume = 0;
     } else {
-        // Medium to loud: linear response
-        compressed = 3.2 + (rms - 0.1) * 100;
+        // Linear scaling: rms * 300 + 10
+        volume = Math.round(rms * 300 + 10);
     }
 
-    // Scale to 0-100 range
-    const volume = Math.min(100, Math.max(0, Math.round(compressed)));
-
-    return volume;
+    // Clamp to 0-100 range
+    return Math.min(100, Math.max(0, volume));
 }
 
 // Update UI with Volume Data
