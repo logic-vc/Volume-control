@@ -1,20 +1,20 @@
 /**
- * Vocal Volume Monitor - Advanced Audio Measurement
+ * Vocal Volume Monitor - Time Domain RMS Measurement
  *
  * Measurement Method:
- * - A-weighting: Applies frequency-dependent weighting to match human hearing
- *   - Reduces low frequencies (bass, environmental noise)
- *   - Emphasizes vocal frequencies (300Hz-3kHz)
- *   - Standard method used in professional SPL meters
+ * - Time Domain RMS (Root Mean Square): Measures actual sound pressure
+ *   - Analyzes the audio waveform directly (not frequency spectrum)
+ *   - Consistent measurement across all vocal ranges (low to high notes)
+ *   - No frequency distribution bias
  *
- * - RMS (Root Mean Square): Calculates true audio power
- *   - More accurate than simple averaging
- *   - Represents actual energy of the sound
+ * - Dynamic range compression for vocal practice
+ *   - Emphasizes mid-range volumes for better sensitivity
+ *   - Clear feedback for consistent volume control
  *
  * Benefits:
- * - Focuses on voice volume, not background noise
- * - Matches how humans perceive loudness
- * - Consistent with professional audio standards
+ * - Equal sensitivity for low notes and high notes
+ * - Measures actual vocal power, not frequency distribution
+ * - Simple, reliable, and accurate for vocal practice
  */
 
 // DOM Elements
@@ -117,18 +117,18 @@ function initAudio(stream) {
     microphone = audioContext.createMediaStreamSource(stream);
     javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
 
-    // Optimized settings for vocal frequency analysis
+    // Optimized settings for vocal volume measurement
     analyser.smoothingTimeConstant = 0.7; // Balance between responsiveness and stability
-    analyser.fftSize = 2048; // Higher resolution for better frequency accuracy
+    analyser.fftSize = 2048; // Sample size for time domain analysis
 
     microphone.connect(analyser);
     analyser.connect(javascriptNode);
     javascriptNode.connect(audioContext.destination);
 
     javascriptNode.onaudioprocess = function() {
-        const array = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(array);
-        const volume = getAverageVolume(array);
+        const array = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(array);
+        const volume = getRMSVolume(array);
         updateUI(volume);
     };
 }
@@ -152,60 +152,35 @@ function stopAudio() {
     }
 }
 
-// A-weighting function
-// Returns weighting factor for a given frequency (in dB)
-function getAWeighting(frequency) {
-    const f = frequency;
-    const f2 = f * f;
-    const numerator = 12194 * 12194 * f2 * f2;
-    const denominator =
-        (f2 + 20.6 * 20.6) *
-        Math.sqrt((f2 + 107.7 * 107.7) * (f2 + 737.9 * 737.9)) *
-        (f2 + 12194 * 12194);
+// Calculate RMS (Root Mean Square) Volume from Time Domain Data
+function getRMSVolume(array) {
+    let sumSquares = 0;
 
-    const RA = numerator / denominator;
-    const A_dB = 20 * Math.log10(RA) + 2.00;
-
-    // Convert dB to linear scale
-    return Math.pow(10, A_dB / 20);
-}
-
-// Calculate A-weighted RMS Volume
-function getAverageVolume(array) {
-    const sampleRate = audioContext.sampleRate;
-    const fftSize = analyser.fftSize;
-
-    let weightedSumSquares = 0;
-    let totalWeight = 0;
-
-    // Apply A-weighting to each frequency bin with RMS calculation
+    // Calculate RMS: square each sample, average, then square root
     for (let i = 0; i < array.length; i++) {
-        // Calculate frequency for this bin
-        const frequency = (i * sampleRate) / fftSize;
-
-        // Skip very low frequencies (below 20Hz) and very high (above 20kHz)
-        if (frequency < 20 || frequency > 20000) continue;
-
-        // Get A-weighting factor for this frequency
-        const weight = getAWeighting(frequency);
-
-        // Normalize byte value to 0-1 range
-        const normalizedValue = array[i] / 255;
-
-        // Apply RMS (Root Mean Square): square the value
-        const squaredValue = normalizedValue * normalizedValue;
-
-        // Apply weighting
-        weightedSumSquares += squaredValue * weight;
-        totalWeight += weight;
+        sumSquares += array[i] * array[i];
     }
 
-    // Calculate RMS: square root of weighted average of squares
-    const rms = totalWeight > 0 ? Math.sqrt(weightedSumSquares / totalWeight) : 0;
+    const rms = Math.sqrt(sumSquares / array.length);
 
-    // Scale to 0-100 range with adjusted sensitivity for vocal frequencies
-    // RMS values are typically 0-1, multiply by 100 and add slight boost for usability
-    return Math.min(100, Math.round(rms * 120));
+    // Apply dynamic range compression for better vocal practice feedback
+    // This makes mid-range volumes more visible while still showing extremes
+    let compressed;
+    if (rms < 0.01) {
+        // Very quiet: minimal response
+        compressed = rms * 50;
+    } else if (rms < 0.1) {
+        // Quiet to medium: boosted response for practice
+        compressed = 0.5 + (rms - 0.01) * 30;
+    } else {
+        // Medium to loud: linear response
+        compressed = 3.2 + (rms - 0.1) * 100;
+    }
+
+    // Scale to 0-100 range
+    const volume = Math.min(100, Math.max(0, Math.round(compressed)));
+
+    return volume;
 }
 
 // Update UI with Volume Data
